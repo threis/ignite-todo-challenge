@@ -1,28 +1,49 @@
-import { useState } from 'react'
 import { Task } from './Task'
 import styles from './TaskList.module.css'
 import clipboard from '../assets/clipboard.svg'
 
-export function TaskList() {
+interface TaskListProps {
+    taskList: Task[]
+    toggleCheckButton: (isChecked: boolean, task: string) => void
+    removeTask: (task: string) => void
+}
 
-    const [taskList, setTaskList] = useState([1,2])
+interface Task {
+    task: string
+    isChecked: boolean
+}
+
+export function TaskList({ taskList, toggleCheckButton, removeTask }: TaskListProps) {
+
+    const totalCheckedTasks = taskList.reduce((totalCheckedTask, currentTask) => {
+        if (currentTask.isChecked) {
+            return totalCheckedTask + 1
+        }
+        return totalCheckedTask
+    }, 0)
 
     return (
         <div>
             <div className={styles.info}>
                 <div className={styles.created}>
                     <p>Tarefas criadas</p>
-                    <span>5</span>
+                    <span>{taskList.length}</span>
                 </div>
                 <div className={styles.done}>
                     <p>Concluídas</p>
-                    <span>2 de 5</span>
+                    <span>{taskList.length > 0 ? `${totalCheckedTasks} de ${taskList.length}` : '0'}</span>
                 </div>
             </div>
             {taskList.length > 0 ? (
-                <div className={styles.taskList}>
-                    {taskList.map(task => (
-                        <Task />
+                <div className={styles.tasks}>
+                    {taskList.map(item => (
+                        <Task
+                            key={item.task}
+                            task={item.task}
+                            isChecked={item.isChecked}
+                            toggleCheckButton={toggleCheckButton}
+                            removeTask={removeTask}
+                        />
                     ))}
                 </div>
             ) : (
